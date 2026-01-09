@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grandline Boy - Premium Edition</title>
+    <style>
+        :root {
+            --gb-green-dark: #0f380f;
+            --gb-green-mid: #306230;
+            --gb-green-light: #8bac0f;
+            --gb-green-pale: #9bbc0f;
+            --gb-body: #c4c4c4;
+            --gb-body-shadow: #a1a1a1;
+            --gb-bezel: #707070;
+            --gb-accent: #8b104a;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .gameboy {
+            background-color: var(--gb-body);
+            width: 340px;
+            height: 560px;
+            border-radius: 12px 12px 80px 12px;
+            box-shadow: 
+                inset -5px -5px 10px rgba(0,0,0,0.2),
+                inset 5px 5px 10px rgba(255,255,255,0.5),
+                15px 15px 30px rgba(0,0,0,0.5);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 25px;
+            user-select: none;
+            border: 1px solid #999;
+        }
+
+        .gameboy-logo {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #8b104a 0%, #2b3595 100%);
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            padding: 8px 15px;
+        }
+
+        .gameboy-logo-text {
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .screen-bezel {
+            background-color: var(--gb-bezel);
+            width: 280px;
+            height: 240px;
+            border-radius: 12px 12px 50px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            border: 2px solid #555;
+        }
+
+        .screen-bezel::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, #8b104a 0%, #2b3595 100%);
+        }
+
+        .screen-label {
+            position: absolute;
+            top: 22px;
+            color: #eee;
+            font-size: 8px;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        #game-screen {
+            background-color: var(--gb-green-pale);
+            width: 180px;
+            height: 180px;
+            border: 6px solid #222;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        #boot-screen, #menu-screen, #intro-screen, #final-screen, #code-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--gb-green-pale);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            box-sizing: border-box;
+            color: var(--gb-green-dark);
+            font-size: 10px;
+            line-height: 1.3;
+        }
+
+        #boot-screen {
+            z-index: 400;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            animation: bootFadeIn 1.2s ease-in forwards;
+        }
+
+        @keyframes bootFadeIn {
+            0% { opacity: 0; }
+            60% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .boot-logo {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: logoAppear 0.8s ease-in 1.5s forwards;
+        }
+
+        @keyframes logoAppear {
+            from { 
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .boot-subtitle {
+            font-size: 9px;
+            opacity: 0;
+            animation: subtitleAppear 0.6s ease-in 2.5s forwards, blink 1.5s infinite 3.5s;
+        }
+
+        @keyframes subtitleAppear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #menu-screen {
+            z-index: 300;
+            justify-content: flex-start;
+            align-items: stretch;
+            padding: 20px;
+            display: none;
+        }
+
+        .menu-title {
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gb-green-dark);
+            opacity: 0;
+            animation: titleAppear 0.6s ease-in 0.5s forwards;
+        }
+
+        @keyframes titleAppear {
+            from { 
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-list {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .game-item {
+            padding: 8px 10px;
+            border: 2px solid transparent;
+            background-color: rgba(15, 56, 15, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            opacity: 0;
+        }
+
+        .game-item:nth-child(1) {
+            animation: itemAppear 0.4s ease-in 1.1s forwards;
+        }
+
+        .game-item:nth-child(2) {
+            animation: itemAppear 0.4s ease-in 1.3s forwards;
+        }
+
+        .game-item:nth-child(3) {
+            animation: itemAppear 0.4s ease-in 1.5s forwards;
+        }
+
+        .game-item:nth-child(4) {
+            animation: itemAppear 0.4s ease-in 1.7s forwards;
+        }
+
+        @keyframes itemAppear {
+            from { 
+                opacity: 0;
+                transform: translateX(-15px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .game-item.selected {
+            border: 2px solid var(--gb-green-dark);
+            background-color: var(--gb-green-mid);
+            color: var(--gb-green-pale);
+        }
+
+        .selector {
+            font-size: 12px;
+            width: 12px;
+        }
+
+        .menu-footer {
+            margin-top: auto;
+            text-align: center;
+            font-size: 9px;
+            padding-top: 15px;
+            border-top: 1px solid var(--gb-green-mid);
+            opacity: 0;
+            animation: footerAppear 0.5s ease-in 2s forwards, blink 1.5s infinite 2.5s;
+        }
+
+        @keyframes footerAppear {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        #intro-screen, #code-screen {
+            display: none;
+        }
+
+        #final-screen {
+            display: none;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 300;
+        }
+
+        #code-screen {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .code-input-display {
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 8px;
+            margin: 20px 0;
+            min-height: 20px;
+        }
+
+        .code-hint {
+            font-size: 8px;
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        h1 {
+            font-size: 16px;
+            margin: 0 0 10px 0;
+            text-align: center;
+            border-bottom: 2px solid var(--gb-green-dark);
+        }
+
+        .rules-list { margin: 0; padding: 0 0 0 15px; }
+
+        .start-prompt {
+            margin-top: auto;
+            text-align: center;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .coords-box {
+            border: 2px dashed var(--gb-green-dark);
+            padding: 8px;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.05);
+            font-family: monospace;
+            line-height: 1.5;
+        }
+
+        .controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .dpad {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin-right: auto;
+            margin-left: 10px;
+        }
+
+        .dpad-cross {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 90px;
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .dpad-cross.horizontal {
+            width: 90px;
+            height: 30px;
+        }
+
+        .dpad-btn {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .btn-up { top: 5px; left: 35px; }
+        .btn-down { bottom: 5px; left: 35px; }
+        .btn-left { top: 35px; left: 5px; }
+        .btn-right { top: 35px; right: 5px; }
+
+        .action-btns {
+            position: absolute;
+            right: 20px;
+            bottom: 140px;
+            transform: rotate(-25deg);
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn-circle {
+            width: 50px;
+            height: 50px;
+            background-color: var(--gb-accent);
+            border-radius: 50%;
+            box-shadow: 0 4px 0 #5a0a30;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .action-btn-circle:active {
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        .start-select {
+            display: flex;
+            gap: 25px;
+            margin-top: 60px;
+        }
+
+        .pill-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pill-btn {
+            width: 45px;
+            height: 12px;
+            background-color: #999;
+            border-radius: 10px;
+            transform: rotate(-25deg);
+            box-shadow: 0 2px 0 #777;
+            cursor: pointer;
+        }
+
+        .pill-label {
+            font-size: 8px;
+            font-weight: bold;
+            color: #777;
+            text-transform: uppercase;
+        }
+
+        .speaker-grill {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            display: grid;
+            grid-template-columns: repeat(6, 4px);
+            gap: 6px;
+            transform: rotate(-25deg);
+        }
+
+        .speaker-hole {
+            width: 4px;
+            height: 30px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 2px;
+            box-shadow: inset 1px 1px 1px rgba(0,0,0,0.2);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .game-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: var(--gb-green-pale);
+        }
+
+        .glitch {
+            animation: glitch 0.3s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="gameboy">
+    <div class="gameboy-logo">
+        <span class="gameboy-logo-text">GRANDLINE BOY</span>
+    </div>
+    
+    <div class="screen-bezel">
+        <span class="screen-label">DOT MATRIX WITH STEREO SOUND</span>
+        <div id="game-screen">
+            <div id="boot-screen">
+                <div class="boot-logo">GRANDLINE<br>BOY</div>
+                <div class="boot-subtitle">PRESS START</div>
+            </div>
+
+            <div id="menu-screen">
+                <div class="menu-title">SELECT GAME</div>
+                <div class="game-list">
+                    <div class="game-item selected" data-game="0">
+                        <span class="selector">▶</span>
+                        <span>SNAKE HUNT</span>
+                    </div>
+                    <div class="game-item" data-game="1">
+                        <span class="selector"></span>
+                        <span>MAZE RUNNER</span>
+                    </div>
+                    <div class="game-item" data-game="2">
+                        <span class="selector"></span>
+                        <span>BRICK BREAK</span>
+                    </div>
+                    <div class="game-item">
+                        <span class="selector"></span>
+                        <span>- - - - - - -</span>
+                    </div>
+                </div>
+                <div class="menu-footer">PRESS [A] TO START</div>
+            </div>
+
+            <div id="intro-screen">
+                <h1 id="game-title"></h1>
+                <ul class="rules-list" id="rules-list"></ul>
+                <p class="start-prompt">APPUYEZ SUR [A]</p>
+            </div>
+
+            <div id="code-screen">
+                <h1>CODE REQUIS</h1>
+                <p style="font-size: 9px;">Entrez le code:</p>
+                <div class="code-input-display" id="code-display"></div>
+                <div class="code-hint" id="code-hint">Utilisez [A] et [B]</div>
+            </div>
+
+            <div id="final-screen">
+                <h1 id="final-title">MISSION RÉUSSIE</h1>
+                <p id="final-text"></p>
+                <div class="coords-box" id="coords-box"></div>
+                <p style="font-size: 8px; margin-top: 10px;">Appuyez sur [B]</p>
+            </div>
+
+            <canvas id="game-canvas" class="game-container"></canvas>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="dpad">
+            <div class="dpad-cross"></div>
+            <div class="dpad-cross horizontal"></div>
+            <button class="dpad-btn btn-up" id="ctrl-up"></button>
+            <button class="dpad-btn btn-down" id="ctrl-down"></button>
+            <button class="dpad-btn btn-left" id="ctrl-left"></button>
+            <button class="dpad-btn btn-right" id="ctrl-right"></button>
+        </div>
+
+        <div class="action-btns">
+            <button class="action-btn-circle" id="ctrl-b">B</button>
+            <button class="action-btn-circle" id="ctrl-a">A</button>
+        </div>
+
+        <div class="start-select">
+            <div class="pill-container">
+                <div class="pill-btn" id="btn-select"></div>
+                <span class="pill-label">Select</span>
+            </div>
+            <div class="pill-container">
+                <div class="pill-btn" id="btn-start"></div>
+                <span class="pill-label">Start</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="speaker-grill">
+        <div class="speaker-hole"></div>
+        <div class="speaker-hole"></div>
+        <div class="speaker-hole"></div>
+        <div class="speaker-hole"></div>
+        <div class="speaker-hole"></div>
+        <div class="speaker-hole"></div>
+    </div>
+</div>
+
+<script>
+    const games = [
+        { name: 'SNAKE HUNT', id: 'snake' },
+        { name: 'MAZE RUNNER', id: 'maze', code: 'aaabbbaa' },
+        { name: 'BRICK BREAK', id: 'brick', code: 'bbbabbba' }
+    ];
+
+    let selectedGame = 0;
+    let currentGame = null;
+    let inBoot = true;
+    let inMenu = false;
+    let inIntro = false;
+    let inCodeScreen = false;
+    let bootComplete = false;
+    let keysPressed = {};
+    let gameRunning = false;
+    let animationId = null;
+    let codeInput = '';
+    let gamesCompleted = { snake: false, maze: false, brick: false };
+
+    const boot = document.getElementById('boot-screen');
+    const menu = document.getElementById('menu-screen');
+    const intro = document.getElementById('intro-screen');
+    const final = document.getElementById('final-screen');
+    const codeScreen = document.getElementById('code-screen');
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = 180;
+    canvas.height = 180;
+
+    const gameCoords = {
+        snake: { x: 1871.79, y: 6415.58, text: "Vous etes vraiment super stupide bon tenez :" },
+        maze: { x: 2301.43, y: 180.83, text: "Pour le meilleur et pour le pire arretez vous :" },
+        brick: { x: 485.78, y: 5617.09, text: "Vous avez 3secondes :" }
+    };
+
+    setTimeout(() => { bootComplete = true; }, 4500);
+
+    // SNAKE HUNT
+    let snake, food, direction, nextDirection, snakeScore;
+
+    function initSnake() {
+        snake = [{ x: 9, y: 9 }];
+        food = { x: 15, y: 15 };
+        direction = { x: 2, y: 0 };
+        nextDirection = { x: 1, y: 0 };
+        snakeScore = 0;
+        gameRunning = true;
+        snakeGameLoop();
+    }
+
+    function snakeGameLoop() {
+        if (!gameRunning) return;
+
+        setTimeout(() => {
+            direction = nextDirection;
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+            if (head.x < 0 || head.x >= 18 || head.y < 0 || head.y >= 18 || 
+                snake.some(s => s.x === head.x && s.y === head.y)) {
+                endGame('snake', false);
+                return;
+            }
+
+            snake.unshift(head);
+
+            if (head.x === food.x && head.y === food.y) {
+                snakeScore++;
+                if (snakeScore >= 10) {
+                    endGame('snake', true);
+                    return;
+                }
+                food = {
+                    x: Math.floor(Math.random() * 18),
+                    y: Math.floor(Math.random() * 18)
+                };
+            } else {
+                snake.pop();
+            }
+
+            ctx.fillStyle = '#9bbc0f';
+            ctx.fillRect(0, 0, 180, 180);
+
+            ctx.fillStyle = '#0f380f';
+            snake.forEach(s => ctx.fillRect(s.x * 10, s.y * 10, 10, 10));
+
+            ctx.fillStyle = '#306230';
+            ctx.fillRect(food.x * 10, food.y * 10, 10, 10);
+
+            ctx.fillStyle = '#0f380f';
+            ctx.font = 'bold 8px monospace';
+            ctx.fillText(`SCORE: ${snakeScore}/10`, 5, 10);
+
+            animationId = requestAnimationFrame(snakeGameLoop);
+        }, 150);
+    }
+
+    // MAZE RUNNER - VERSION SIMPLIFIÉE ET SOLVABLE
+    let player, maze, mazeExit, mazeTime, mazeEnemies, hideSpots, isHiding, enemyMoveCounter;
+
+    function generateSimpleMaze() {
+        // Labyrinthe simplifié avec un chemin clair vers la sortie
+        const m = [
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,1,0,1,0,1,1,1,0,1,0,1,1,1,1,0,1],
+            [1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1],
+            [1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1],
+            [1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,1],
+            [1,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1],
+            [1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,1,0,1,0,1,1,1,1,1,1,1,1,0,1],
+            [1,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1],
+            [1,0,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,1],
+            [1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,1,0,1],
+            [1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1],
+            [1,0,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+        ];
+        
+        // Placer 3 cachettes (code 3) dans des zones sûres
+        m[3][5] = 3;  // Cachette 1
+        m[7][12] = 3; // Cachette 2
+        m[11][9] = 3; // Cachette 3
+        
+        return m;
+    }
+
+    function initMaze() {
+        player = { x: 1, y: 1 };
+        maze = generateSimpleMaze();
+        mazeExit = { x: 16, y: 16 };
+        mazeTime = Date.now();
+        enemyMoveCounter = 0;
+        isHiding = false;
+        
+        // 3 ennemis TRÈS LENTS avec patterns cycliques simples A->B->A
+        mazeEnemies = [
+            { 
+                x: 3, y: 1, 
+                path: [{x:3,y:1}, {x:3,y:3}, {x:5,y:3}, {x:5,y:1}],
+                pathIndex: 0,
+                speed: 50  // Très lent (était 8)
+            },
+            { 
+                x: 11, y: 5, 
+                path: [{x:11,y:5}, {x:15,y:5}, {x:15,y:9}, {x:11,y:9}],
+                pathIndex: 0,
+                speed: 60  // Très lent (était 10)
+            },
+            { 
+                x: 7, y: 13, 
+                path: [{x:7,y:13}, {x:11,y:13}, {x:11,y:15}, {x:7,y:15}],
+                pathIndex: 0,
+                speed: 70  // Très lent (était 12)
+            }
+        ];
+        
+        hideSpots = [
+            { x: 5, y: 3 },
+            { x: 12, y: 7 },
+            { x: 9, y: 11 }
+        ];
+        
+        gameRunning = true;
+        mazeGameLoop();
+    }
+    function mazeGameLoop() {
+        if (!gameRunning) return;
+
+        // Déplacement du joueur par case complète
+        if (keysPressed['ArrowLeft'] && player.x > 0 && maze[player.y][player.x - 1] !== 1) {
+            player.x--;
+            keysPressed['ArrowLeft'] = false;
+            isHiding = maze[player.y][player.x] === 3;
+        }
+        if (keysPressed['ArrowRight'] && player.x < 17 && maze[player.y][player.x + 1] !== 1) {
+            player.x++;
+            keysPressed['ArrowRight'] = false;
+            isHiding = maze[player.y][player.x] === 3;
+        }
+        if (keysPressed['ArrowUp'] && player.y > 0 && maze[player.y - 1][player.x] !== 1) {
+            player.y--;
+            keysPressed['ArrowUp'] = false;
+            isHiding = maze[player.y][player.x] === 3;
+        }
+        if (keysPressed['ArrowDown'] && player.y < 17 && maze[player.y + 1][player.x] !== 1) {
+            player.y++;
+            keysPressed['ArrowDown'] = false;
+            isHiding = maze[player.y][player.x] === 3;
+        }
+
+        // Déplacer les ennemis en cycle (TRÈS LENTS maintenant)
+        enemyMoveCounter++;
+        mazeEnemies.forEach(enemy => {
+            if (enemyMoveCounter % enemy.speed === 0) {
+                enemy.pathIndex = (enemy.pathIndex + 1) % enemy.path.length;
+                const target = enemy.path[enemy.pathIndex];
+                enemy.x = target.x;
+                enemy.y = target.y;
+            }
+        });
+
+        // Collision uniquement si pas caché
+        if (!isHiding) {
+            for (let enemy of mazeEnemies) {
+                if (enemy.x === player.x && enemy.y === player.y) {
+                    endGame('maze', false);
+                    return;
+                }
+            }
+        }
+
+        if (player.x === mazeExit.x && player.y === mazeExit.y) {
+            gameRunning = false;
+            showCodeScreen('maze');
+            return;
+        }
+
+        const elapsed = Math.floor((Date.now() - mazeTime) / 1000);
+        if (elapsed >= 120) {
+            endGame('maze', false);
+            return;
+        }
+
+        ctx.fillStyle = '#9bbc0f';
+        ctx.fillRect(0, 0, 180, 180);
+
+        // Dessiner le labyrinthe
+        for (let y = 0; y < 18; y++) {
+            for (let x = 0; x < 18; x++) {
+                if (maze[y][x] === 1) {
+                    ctx.fillStyle = '#306230';
+                    ctx.fillRect(x * 10, y * 10, 10, 10);
+                } else if (maze[y][x] === 2) {
+                    ctx.fillStyle = '#8bac0f';
+                    ctx.fillRect(x * 10, y * 10, 10, 10);
+                } else if (maze[y][x] === 3) {
+                    // Cachettes très visibles
+                    ctx.fillStyle = '#8bac0f';
+                    ctx.fillRect(x * 10, y * 10, 10, 10);
+                    ctx.fillStyle = '#306230';
+                    ctx.fillRect(x * 10 + 2, y * 10 + 2, 2, 2);
+                    ctx.fillRect(x * 10 + 6, y * 10 + 2, 2, 2);
+                    ctx.fillRect(x * 10 + 2, y * 10 + 6, 2, 2);
+                    ctx.fillRect(x * 10 + 6, y * 10 + 6, 2, 2);
+                }
+            }
+        }
+
+        // Dessiner les ennemis
+        mazeEnemies.forEach(e => {
+            ctx.fillStyle = '#ff0040';
+            ctx.fillRect(e.x * 10, e.y * 10, 10, 10);
+        });
+
+        // Dessiner le joueur
+        if (isHiding) {
+            ctx.fillStyle = 'rgba(15, 56, 15, 0.6)';
+            ctx.fillRect(player.x * 10 + 1, player.y * 10 + 1, 8, 8);
+        } else {
+            ctx.fillStyle = '#0f380f';
+            ctx.fillRect(player.x * 10, player.y * 10, 10, 10);
+        }
+
+        ctx.fillStyle = '#0f380f';
+        ctx.font = 'bold 8px monospace';
+        ctx.fillText(`TEMPS: ${elapsed}s`, 5, 10);
+        if (isHiding) {
+            ctx.fillStyle = '#8bac0f';
+            ctx.fillText(`CACHÉ`, 135, 10);
+        }
+
+        animationId = requestAnimationFrame(mazeGameLoop);
+    }
+
+    // BRICK BREAK
+    let paddle, ball, bricks, brickScore;
+
+    function initBrick() {
+        paddle = { x: 80, y: 165, w: 30, h: 5, speed: 3 };
+        ball = { x: 90, y: 150, vx: 1.10, vy: -1.00, r: 3 };
+        bricks = [];
+        for (let y = 0; y < 5; y++) {
+            for (let x = 0; x < 9; x++) {
+                bricks.push({ x: x * 20, y: y * 10 + 20, w: 18, h: 8, active: true });
+            }
+        }
+        brickScore = 0;
+        gameRunning = true;
+        brickGameLoop();
+    }
+
+    function brickGameLoop() {
+        if (!gameRunning) return;
+
+        if (keysPressed['ArrowLeft']) paddle.x = Math.max(0, paddle.x - paddle.speed);
+        if (keysPressed['ArrowRight']) paddle.x = Math.min(150, paddle.x + paddle.speed);
+
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        if (ball.x <= ball.r || ball.x >= 180 - ball.r) ball.vx *= -1;
+        if (ball.y <= ball.r) ball.vy *= -1;
+
+        if (ball.y >= 180) {
+            endGame('brick', false);
+            return;
+        }
+
+        if (ball.y + ball.r >= paddle.y && ball.y - ball.r <= paddle.y + paddle.h &&
+            ball.x >= paddle.x && ball.x <= paddle.x + paddle.w) {
+            ball.vy = -Math.abs(ball.vy);
+            ball.vx += (ball.x - (paddle.x + paddle.w / 2)) * 0.1;
+        }
+
+        bricks.forEach(brick => {
+            if (brick.active && ball.x + ball.r >= brick.x && ball.x - ball.r <= brick.x + brick.w &&
+                ball.y + ball.r >= brick.y && ball.y - ball.r <= brick.y + brick.h) {
+                brick.active = false;
+                ball.vy *= -1;
+                brickScore++;
+            }
+        });
+
+        if (brickScore >= 45) {
+            gameRunning = false;
+            showCodeScreen('brick');
+            return;
+        }
+
+        ctx.fillStyle = '#9bbc0f';
+        ctx.fillRect(0, 0, 180, 180);
+
+        ctx.fillStyle = '#306230';
+        bricks.forEach(b => { if (b.active) ctx.fillRect(b.x, b.y, b.w, b.h); });
+
+        ctx.fillStyle = '#0f380f';
+        ctx.fillRect(paddle.x, paddle.y, paddle.w, paddle.h);
+
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = 'bold 8px monospace';
+        ctx.fillText(`BRIQUES: ${brickScore}/45`, 5, 10);
+
+        animationId = requestAnimationFrame(brickGameLoop);
+    }
+
+    function showCodeScreen(game) {
+        canvas.style.display = 'none';
+        codeScreen.style.display = 'flex';
+        codeInput = '';
+        inCodeScreen = true;
+        document.getElementById('code-display').textContent = '';
+        document.getElementById('code-hint').textContent = 'Utilisez [A] et [B]';
+    }
+
+    function checkCode(game) {
+        const correctCode = games.find(g => g.id === game).code;
+        if (codeInput === correctCode) {
+            gamesCompleted[game] = true;
+            endGame(game, true);
+        } else {
+            document.getElementById('code-hint').textContent = 'CODE INCORRECT! Réessayez...';
+            codeInput = '';
+            document.getElementById('code-display').textContent = '';
+            setTimeout(() => {
+                document.getElementById('code-hint').textContent = 'Utilisez [A] et [B]';
+            }, 2000);
+        }
+    }
+
+   function endGame(game, won) {
+    gameRunning = false;
+    inCodeScreen = false;
+    if (animationId) cancelAnimationFrame(animationId);
+
+    if (won) {
+        codeScreen.style.display = 'none';
+        canvas.style.display = 'none';
+
+        // ===== AFFICHAGE DES COORDONNÉES =====
+        final.style.display = 'flex';
+        const coords = gameCoords[game];
+        document.getElementById('final-text').textContent = coords.text;
+        document.getElementById('coords-box').innerHTML = `
+            x = ${coords.x}<br>
+            y = ${coords.y}
+        `;
+
+        // ===== CAS SPÉCIAL : FIN DU JEU 3 (BRICK) =====
+        if (game === 'brick') {
+            // 1️⃣ Afficher les coordonnées pendant 3 secondes
+            setTimeout(() => {
+                final.style.display = 'none';
+                canvas.style.display = 'block';
+
+                // 2️⃣ Écran "Ce n'est que le début..."
+                ctx.fillStyle = '#9bbc0f';
+                ctx.fillRect(0, 0, 180, 180);
+
+                ctx.fillStyle = '#0f380f';
+                ctx.font = 'bold 9px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText("Ce n'est que le début....", 90, 80);
+                ctx.fillText("Aurevoir....", 90, 95);
+                ctx.textAlign = 'left';
+
+                // 3️⃣ Effet de bug visuel
+                let glitchInterval = setInterval(() => {
+                    ctx.fillStyle = '#0f380f';
+                    ctx.fillRect(
+                        Math.random() * 180,
+                        Math.random() * 180,
+                        5,
+                        5
+                    );
+                }, 50);
+
+                // 4️⃣ Reload après 5 secondes
+                setTimeout(() => {
+                    clearInterval(glitchInterval);
+                    location.reload();
+                }, 5000);
+
+            }, 3000); // ⏱️ 3 secondes pour les coordonnées
+        }
+
+    } else {
+        // ===== GAME OVER =====
+        ctx.fillStyle = '#9bbc0f';
+        ctx.fillRect(0, 0, 180, 180);
+        ctx.fillStyle = '#0f380f';
+        ctx.font = 'bold 12px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('GAME OVER', 90, 80);
+        ctx.font = 'bold 8px monospace';
+        ctx.fillText('Appuyez sur [A]', 90, 100);
+        ctx.textAlign = 'left';
+    }
+}
+    function selectGameInMenu(index) {
+        const items = document.querySelectorAll('.game-item[data-game]');
+        items.forEach((item, idx) => {
+            const selector = item.querySelector('.selector');
+            if (idx === index) {
+                item.classList.add('selected');
+                selector.textContent = '▶';
+            } else {
+                item.classList.remove('selected');
+                selector.textContent = '';
+            }
+        });
+        selectedGame = index;
+    }
+
+    function goToMenu() {
+        if (!bootComplete) return;
+        boot.style.opacity = '0';
+        boot.style.transition = 'opacity 0.4s';
+        setTimeout(() => {
+            boot.style.display = 'none';
+            menu.style.display = 'flex';
+            menu.style.opacity = '1';
+            inBoot = false;
+            inMenu = true;
+        }, 400);
+    }
+
+    function startFromMenu() {
+        currentGame = games[selectedGame].id;
+        inMenu = false;
+        inIntro = true;
+
+        menu.style.opacity = '0';
+        setTimeout(() => {
+            menu.style.display = 'none';
+            const title = document.getElementById('game-title');
+            const rules = document.getElementById('rules-list');
+
+            if (currentGame === 'snake') {
+                title.textContent = 'SNAKE HUNT';
+                rules.innerHTML = `
+                    <li>Mangez 10 pommes.</li>
+                    <li>Ne vous mordez pas !</li>
+                    <li>Flèches : directions.</li>
+                    <li>[B] Retour au menu.</li>
+                `;
+            } else if (currentGame === 'maze') {
+                title.textContent = 'MAZE RUNNER';
+                rules.innerHTML = `
+                    <li>Atteignez la sortie claire.</li>
+                    <li>3 ennemis patrouillent !</li>
+                    <li>Cachez-vous (carrés à points).</li>
+                    <li>Réflexion et timing !</li>
+                `;
+            } else if (currentGame === 'brick') {
+                title.textContent = 'BRICK BREAK';
+                rules.innerHTML = `
+                    <li>Détruisez les briques.</li>
+                    <li>Ne laissez pas tomber !</li>
+                    <li>Flèches gauche/droite.</li>
+                    <li>[B] Retour au menu.</li>
+                `;
+            }
+
+            intro.style.display = 'flex';
+            intro.style.opacity = '1';
+        }, 400);
+    }
+
+    function startGame() {
+        inIntro = false;
+        intro.style.display = 'none';
+        canvas.style.display = 'block';
+        final.style.display = 'none';
+        codeScreen.style.display = 'none';
+        keysPressed = {};
+
+        if (currentGame === 'snake') initSnake();
+        else if (currentGame === 'maze') initMaze();
+        else if (currentGame === 'brick') initBrick();
+    }
+
+    function returnToMenu() {
+        gameRunning = false;
+        inCodeScreen = false;
+        if (animationId) cancelAnimationFrame(animationId);
+        keysPressed = {};
+        
+        canvas.style.display = 'none';
+        intro.style.display = 'none';
+        final.style.display = 'none';
+        codeScreen.style.display = 'none';
+        
+        menu.style.display = 'flex';
+        menu.style.opacity = '1';
+        inMenu = true;
+        inIntro = false;
+    }
+
+    document.getElementById('ctrl-up').addEventListener('click', () => {
+        if (inMenu && selectedGame > 0) selectGameInMenu(selectedGame - 1);
+        else if (currentGame === 'snake' && gameRunning && direction.y === 0) nextDirection = { x: 0, y: -1 };
+    });
+
+    document.getElementById('ctrl-down').addEventListener('click', () => {
+        if (inMenu && selectedGame < 2) selectGameInMenu(selectedGame + 1);
+        else if (currentGame === 'snake' && gameRunning && direction.y === 0) nextDirection = { x: 0, y: 1 };
+    });
+
+    document.getElementById('ctrl-left').addEventListener('click', () => {
+        if (currentGame === 'snake' && gameRunning && direction.x === 0) nextDirection = { x: -1, y: 0 };
+    });
+
+    document.getElementById('ctrl-right').addEventListener('click', () => {
+        if (currentGame === 'snake' && gameRunning && direction.x === 0) nextDirection = { x: 1, y: 0 };
+    });
+
+    document.getElementById('ctrl-a').addEventListener('click', () => {
+        if (inCodeScreen) {
+            codeInput += 'a';
+            document.getElementById('code-display').textContent = codeInput.toUpperCase();
+            if (codeInput.length >= 8) checkCode(currentGame);
+        } else if (inMenu) startFromMenu();
+        else if (inIntro) startGame();
+        else if (!gameRunning && canvas.style.display === 'block') startGame();
+    });
+
+    document.getElementById('ctrl-b').addEventListener('click', () => {
+        if (inCodeScreen) {
+            codeInput += 'b';
+            document.getElementById('code-display').textContent = codeInput.toUpperCase();
+            if (codeInput.length >= 8) checkCode(currentGame);
+        } else if (final.style.display === 'flex' || (canvas.style.display === 'block' && !inIntro)) {
+            returnToMenu();
+        }
+    });
+
+    document.getElementById('btn-start').addEventListener('click', () => {
+        if (inBoot && bootComplete) goToMenu();
+    });
+
+    window.addEventListener('keydown', (e) => {
+        keysPressed[e.key] = true;
+
+        switch(e.key) {
+            case 'ArrowUp':
+                if (inMenu && selectedGame > 0) selectGameInMenu(selectedGame - 1);
+                else if (currentGame === 'snake' && gameRunning && direction.y === 0) nextDirection = { x: 0, y: -1 };
+                break;
+            case 'ArrowDown':
+                if (inMenu && selectedGame < 2) selectGameInMenu(selectedGame + 1);
+                else if (currentGame === 'snake' && gameRunning && direction.y === 0) nextDirection = { x: 0, y: 1 };
+                break;
+            case 'ArrowLeft':
+                if (currentGame === 'snake' && gameRunning && direction.x === 0) nextDirection = { x: -1, y: 0 };
+                break;
+            case 'ArrowRight':
+                if (currentGame === 'snake' && gameRunning && direction.x === 0) nextDirection = { x: 1, y: 0 };
+                break;
+            case 's':
+            case 'S':
+                if (inBoot && bootComplete) goToMenu();
+                break;
+            case 'a':
+            case 'A':
+            case 'Enter':
+                if (inCodeScreen) {
+                    codeInput += 'a';
+                    document.getElementById('code-display').textContent = codeInput.toUpperCase();
+                    if (codeInput.length >= 8) checkCode(currentGame);
+                } else if (inMenu) startFromMenu();
+                else if (inIntro) startGame();
+                else if (!gameRunning && canvas.style.display === 'block') startGame();
+                break;
+            case 'b':
+            case 'B':
+                if (inCodeScreen) {
+                    codeInput += 'b';
+                    document.getElementById('code-display').textContent = codeInput.toUpperCase();
+                    if (codeInput.length >= 8) checkCode(currentGame);
+                }
+                break;
+            case 'Escape':
+                if (!inCodeScreen && (final.style.display === 'flex' || (canvas.style.display === 'block' && !inIntro))) {
+                    returnToMenu();
+                }
+                break;
+        }
+    });
+
+    window.addEventListener('keyup', (e) => {
+        delete keysPressed[e.key];
+    });
+</script>
+</body>
+</html>
